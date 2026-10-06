@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>October 7th 2026</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Montserrat:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pastel: {
+                            sky: '#E0F2FE',
+                            blue: '#BAE6FD',
+                            accent: '#38BDF8',
+                            deep: '#0284C7',
+                            soft: '#F0F9FF',
+                            lavender: '#E9D5FF',
+                            pink: '#FCE7F3'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                        handwriting: ['Caveat', 'cursive']
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-sky-100 via-sky-50 to-indigo-100 text-slate-700 min-h-screen relative overflow-x-hidden font-sans selection:bg-pastel-blue selection:text-pastel-deep">
+
+    <canvas id="heartCanvas"></canvas>
+
+    <!-- Floating Background Decor Elements -->
+    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden" id="bgBubbles"></div>
+
+    <!-- Music Player Audio Controller (Floating Widget) -->
+    <div id="musicWidget" class="fixed top-5 right-5 z-40 hidden transition-all duration-500 transform hover:scale-105">
+        <button id="toggleMusicBtn" onclick="toggleAudio()" class="glass-card shadow-lg hover:shadow-xl px-4 py-2.5 rounded-full flex items-center space-x-3 text-slate-700 border border-white">
+            <div id="vinylIcon" class="w-8 h-8 rounded-full bg-pastel-accent flex items-center justify-center text-white text-xs shadow-inner">
+                <i class="fa-solid fa-music"></i>
+            </div>
+            <div class="text-left hidden sm:block">
+                <p class="text-xs font-bold text-slate-800 leading-none">Sweet Melody ✨</p>
+                <p id="musicStatusText" class="text-[10px] text-sky-600 font-semibold mt-0.5">Klik untuk Putar</p>
+            </div>
+            <span class="text-sky-500 pl-1"><i id="playPauseIcon" class="fa-solid fa-play text-sm"></i></span>
+        </button>
+    </div>
+
+    <!-- SECTION 1: LOCK SCREEN / GATE INTERAKTIF -->
+    <section id="lockScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 bg-gradient-to-tr from-sky-200/90 via-sky-100/90 to-indigo-100/90 backdrop-blur-sm transition-all duration-700">
+        
+        <!-- HEART ANIMATION VERSION SWITCHER TOOLBAR -->
+        <div class="relative z-20 mb-6 bg-white/80 backdrop-blur-md p-1.5 rounded-full shadow-md border border-sky-200 flex items-center space-x-1">
+            <button onclick="changeHeartMode(1)" id="modeBtn1" class="px-3 py-1.5 rounded-full text-xs font-bold transition-all bg-sky-500 text-white shadow-sm">
+                💖
+            </button>
+            <button onclick="changeHeartMode(2)" id="modeBtn2" class="px-3 py-1.5 rounded-full text-xs font-bold transition-all text-sky-700 hover:bg-sky-100">
+                ✨
+            </button>
+            <button onclick="changeHeartMode(3)" id="modeBtn3" class="px-3 py-1.5 rounded-full text-xs font-bold transition-all text-sky-700 hover:bg-sky-100">
+                💎
+            </button>
+        </div>
+
+        <div class="max-w-md w-full glass-card p-8 rounded-3xl shadow-2xl text-center border border-white relative overflow-hidden transform transition-all hover:scale-[1.01] z-20">
+            <div class="absolute -top-12 -right-12 w-32 h-32 bg-sky-300 rounded-full blur-2xl opacity-50"></div>
+            <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-indigo-300 rounded-full blur-2xl opacity-50"></div>
+
+            <!-- Envelope / Gift Icon Header -->
+            <div class="relative z-10 mb-6 cursor-pointer group" onclick="openSurpriseGate()">
+                <div class="w-24 h-24 mx-auto bg-gradient-to-tr from-sky-300 via-sky-400 to-indigo-400 rounded-2xl shadow-xl flex items-center justify-center text-white text-4xl transform group-hover:rotate-6 group-hover:scale-110 transition-all duration-300 animate-float">
+                    <i class="fa-solid fa-gift drop-shadow-md"></i>
+                </div>
+                <div class="absolute inset-0 rounded-2xl bg-sky-400 blur-xl opacity-30 group-hover:opacity-60 transition-opacity"></div>
+            </div>
+
+            <h1 class="text-2xl sm:text-3xl font-serif font-bold text-slate-800 mb-2">
+                THIS IS FOR YOU!✨💙
+            </h1>
+            <p class="text-xs sm:text-sm text-sky-700 mb-6 font-medium">
+                Sebuah ucapan kecil yang dibuat dengan hati.
+            </p>
+
+            <!-- Countdown Box Component -->
+            <div class="bg-white/70 backdrop-blur-md rounded-2xl p-4 shadow-inner mb-6 border border-sky-100">
+                <p class="text-[11px] uppercase tracking-wider text-sky-600 font-bold mb-2">The Day🎂</p>
+                <div class="grid grid-cols-4 gap-2 text-center" id="countdownTimer">
+                    <div class="bg-sky-50 p-2 rounded-xl border border-sky-200/60 flex items-center justify-center">
+                        <span id="cd-days" class="text-xl font-extrabold text-sky-600">Wed</span>
+                    </div>
+                    <div class="bg-sky-50 p-2 rounded-xl border border-sky-200/60 flex items-center justify-center">
+                        <span id="cd-hours" class="block text-xl font-extrabold text-sky-600">07</span>
+                    </div>
+                    <div class="bg-sky-50 p-2 rounded-xl border border-sky-200/60 flex items-center justify-center">
+                        <span id="cd-mins" class="block text-xl font-extrabold text-sky-600">Oct</span>
+                    </div>
+                    <div class="bg-sky-50 p-2 rounded-xl border border-sky-200/60 flex items-center justify-center">
+                        <span id="cd-secs" class="block text-xl font-extrabold text-sky-600">2026</span>
+                    </div>
+                </div>
+                <div id="birthdayTodayMsg" class="hidden text-sky-700 font-bold text-sm py-2">
+                    🎉 YAY! Hari ini adalah hari spesialmu! 🎉
+                </div>
+            </div>
+
+            <!-- Gate Unlock Button -->
+            <button onclick="openSurpriseGate()" class="w-full py-3.5 px-6 bg-gradient-to-r from-sky-400 via-sky-500 to-indigo-500 hover:from-sky-500 hover:to-indigo-600 text-white font-bold rounded-2xl shadow-lg hover:shadow-sky-300/50 transform hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center justify-center space-x-2">
+                <span>Buka!💙</span>
+                <i class="fa-solid fa-sparkles text-xs"></i>
+            </button>
+        </div>
+    </section>
+
+    <!-- MAIN CONTENT AREA (Hidden initially, visible after unlocking) -->
+    <main id="mainContent" class="opacity-0 transition-opacity duration-1000 hidden relative z-20">
+
+        <!-- SECTION 2: HERO WELCOME -->
+        <section class="min-h-screen relative flex items-center justify-center pt-20 pb-16 px-4">
+            <div class="max-w-4xl mx-auto text-center relative z-10">
+                <span class="inline-block px-4 py-1.5 rounded-full bg-sky-200/80 text-sky-800 text-xs sm:text-sm font-bold tracking-wide uppercase mb-4 shadow-sm backdrop-blur-sm">
+                    ✨ Special Birthday Wishes ✨
+                </span>
+                <h1 class="text-4xl sm:text-6xl md:text-7xl font-serif font-bold text-slate-800 mb-4 leading-tight">
+                    Happyy Birthdayy, <br>
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 font-handwriting text-5xl sm:text-7xl md:text-8xl">
+                        aviiii! 💙
+                    </span>
+                </h1>
+                <p class="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto mb-8 font-medium leading-relaxed">
+                    Tanggal 7 Oktober yang sering sekali nn nda nantikan ini adalah tanggal 7 Oktober yang sama, dengan yang selalu kita berusaha beking ada <span class="font-bold" style="color:#03045E; font-style: italic;">sesuatu</span> yang spesial for nn ingat.
+                </p>
+                <p class="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto mb-8 font-medium leading-relaxed">
+                    Meski ini biasa aja, mar mari torang rayakan sedikit.
+                </p>
+
+                <br>
+                <!-- Scroll Down Hint Indicator -->
+                <div class="flex justify-center mt-8">
+                    <a href="#cakeSection" class="inline-flex items-center space-x-2 text-sky-600 font-bold bg-white/80 hover:bg-white px-5 py-2.5 rounded-full shadow-md hover:shadow-lg transition-all animate-bounce border border-sky-200">
+                        <span>Tiup Lilin</span>
+                        <i class="fa-solid fa-arrow-down text-xs"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: VIRTUAL BIRTHDAY CAKE & CANDLE -->
+        <section id="cakeSection" class="py-20 px-4 relative">
+            <div class="max-w-3xl mx-auto text-center">
+                <div class="glass-card rounded-3xl p-8 sm:p-12 shadow-xl border border-white relative overflow-hidden">
+                    <span class="text-xs font-bold uppercase tracking-widest text-sky-600 mb-2 block">Make A Wish!!!! ✨</span>
+                    <h2 class="text-3xl sm:text-4xl font-serif font-bold text-slate-800 mb-6">Kue Ulang Tahun Virtual</h2>
+                    <p class="text-slate-600 text-sm sm:text-base mb-10 max-w-lg mx-auto">
+                        Pikirkan harapan terindah untuk umur yang baru, terus tiup lilin ala-ala di bawah ini! 🎂
+                    </p>
+
+                    <!-- Interactive Cake Illustration -->
+                    <div class="relative w-64 h-64 sm:w-72 sm:h-72 mx-auto my-6 flex flex-col items-center justify-end">
+                        
+                        <!-- Candle & Flame Component -->
+                        <div id="candleContainer" class="relative z-20 cursor-pointer group flex flex-col items-center" onclick="blowCandle()">
+                            <!-- Flame -->
+                            <div id="candleFlame" class="w-6 h-9 bg-gradient-to-t from-amber-400 via-orange-300 to-yellow-100 rounded-full animate-flicker shadow-[0_0_20px_rgba(251,191,36,0.9)] transform -translate-y-1 transition-all duration-500"></div>
+                            <!-- Smoke Effect (Hidden by default) -->
+                            <div id="candleSmoke" class="hidden w-2 h-8 bg-slate-300/60 rounded-full blur-sm -translate-y-4 transition-all"></div>
+                            <!-- Candle Stick -->
+                            <div class="w-4 h-16 bg-gradient-to-b from-sky-200 via-sky-300 to-indigo-300 rounded-t-sm shadow-md border-x border-white/60"></div>
+                        </div>
+
+                        <!-- Birthday Cake Visual Layers -->
+                        <div class="w-48 h-12 bg-sky-200 rounded-t-full shadow-inner border-t-4 border-white relative z-10 flex items-center justify-around px-4">
+                            <!-- Cake Frosting Decor -->
+                            <div class="w-4 h-4 bg-white rounded-full -mt-6"></div>
+                            <div class="w-4 h-4 bg-white rounded-full -mt-6"></div>
+                            <div class="w-4 h-4 bg-white rounded-full -mt-6"></div>
+                            <div class="w-4 h-4 bg-white rounded-full -mt-6"></div>
+                        </div>
+                        <div class="w-56 h-16 bg-gradient-to-b from-sky-300 to-sky-400 shadow-md relative z-10 flex items-center justify-center">
+                            <span class="text-white text-xs font-serif tracking-widest">Happy 7th Oct</span>
+                        </div>
+                        <div class="w-64 h-16 bg-gradient-to-b from-sky-400 to-indigo-400 rounded-b-2xl shadow-lg relative z-10 border-b-4 border-indigo-500/30"></div>
+                        <!-- Plate -->
+                        <div class="w-72 h-4 bg-white rounded-full shadow-xl -mt-1 border border-slate-200"></div>
+                    </div>
+
+                    <!-- Blow Instructions & Status Buttons -->
+                    <div class="mt-8 space-y-4">
+                        <button id="blowBtn" onclick="blowCandle()" class="px-8 py-3 bg-gradient-to-r from-sky-400 to-indigo-500 text-white font-bold rounded-2xl shadow-lg hover:shadow-sky-300/50 hover:scale-105 active:scale-95 transition-all text-sm">
+                            <i class="fa-solid fa-wind mr-2"></i> Klik / Tap Untuk Mentiup Lilin!
+                        </button>
+                        <p class="text-xs text-sky-700 font-medium italic" id="candleStatus">
+                            Tiup Lilinnya!!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: MEMORY GALLERY & POLAROID CAROUSEL -->
+        <section class="py-20 px-4 relative">
+            <div class="max-w-5xl mx-auto">
+                <div class="text-center mb-14">
+                    <span class="text-xs font-bold uppercase tracking-widest text-sky-600 mb-2 block">Sweet Memories ✨</span>
+                    <h2 class="text-3xl sm:text-4xl font-serif font-bold text-slate-600">Momen yang disweet-sweetkan hihi</h2>
+                    <p class="text-slate-600 text-sm sm:text-base mt-2">Can't wait to make more sweet memories together yarrrr</p>
+                </div>
+
+                <!-- Grid of Polaroid Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Polaroid 1 -->
+                    <div class="bg-white p-4 rounded-2xl shadow-xl border border-sky-100 transform hover:-rotate-2 hover:scale-105 transition-all duration-300 group">
+                        <div class="relative overflow-hidden rounded-xl bg-sky-50 aspect-square mb-4">
+                            <img src="picture/pic1.jpeg" alt="Sahabat" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-sky-900/10 group-hover:bg-transparent transition-colors"></div>
+                        </div>
+                        <p class="font-handwriting text-2xl text-slate-800 text-center">🌸</p>
+                        <!-- <p class="text-xs text-sky-600 text-center font-semibold mt-1">#OurMemory</p> -->
+                    </div>
+
+                    <!-- Polaroid 2 -->
+                    <div class="bg-white p-4 rounded-2xl shadow-xl border border-sky-100 transform hover:rotate-2 hover:scale-105 transition-all duration-300 group">
+                        <div class="relative overflow-hidden rounded-xl bg-sky-50 aspect-square mb-4">
+                            <img src="picture/pic2.jpeg" alt="Momen Indah" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-sky-900/10 group-hover:bg-transparent transition-colors"></div>
+                        </div>
+                        <p class="font-handwriting text-2xl text-slate-800 text-center">🌟</p>
+                        <!-- <p class="text-xs text-sky-600 text-center font-semibold mt-1">#OurMemory</p> -->
+                    </div>
+
+                    <!-- Polaroid 3 -->
+                    <div class="bg-white p-4 rounded-2xl shadow-xl border border-sky-100 transform hover:-rotate-2 hover:scale-105 transition-all duration-300 group">
+                        <div class="relative overflow-hidden rounded-xl bg-sky-50 aspect-square mb-4">
+                            <img src="picture/pic3.jpeg" alt="Sahabat" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-sky-900/10 group-hover:bg-transparent transition-colors"></div>
+                        </div>
+                        <p class="font-handwriting text-2xl text-slate-800 text-center">🦋</p>
+                        <!-- <p class="text-xs text-sky-600 text-center font-semibold mt-1">#OurMemory</p> -->
+                    </div>
+
+                    <!-- Polaroid 4 -->
+                    <div class="bg-white p-4 rounded-2xl shadow-xl border border-sky-100 transform hover:rotate-2 hover:scale-105 transition-all duration-300 group">
+                        <div class="relative overflow-hidden rounded-xl bg-sky-50 aspect-square mb-4">
+                            <img src="picture/pic4.jpeg" alt="Momen Indah" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-sky-900/10 group-hover:bg-transparent transition-colors"></div>
+                        </div>
+                        <p class="font-handwriting text-2xl text-slate-800 text-center">🍒</p>
+                        <!-- <p class="text-xs text-sky-600 text-center font-semibold mt-1">#OurMemory</p> -->
+                    </div>
+
+                    <!-- Polaroid 5 -->
+                    <div class="bg-white p-4 rounded-2xl shadow-xl border border-sky-100 transform hover:-rotate-1 hover:scale-105 transition-all duration-300 group sm:col-span-2 lg:col-span-1">
+                        <div class="relative overflow-hidden rounded-xl bg-sky-50 aspect-square mb-4">
+                            <img src="picture/pic5.jpeg" alt="Sahabat Perempuan" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-sky-900/10 group-hover:bg-transparent transition-colors"></div>
+                        </div>
+                        <p class="font-handwriting text-2xl text-slate-800 text-center">💙</p>
+                        <!-- <p class="text-xs text-sky-600 text-center font-semibold mt-1">#OurMemory</p> -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: LETTER FROM THE HEART -->
+        <section class="py-20 px-4 relative">
+            <div class="max-w-3xl mx-auto">
+                <div class="text-center mb-10">
+                    <span class="text-xs font-bold uppercase tracking-widest text-sky-600 mb-2 block">Special Message ✨</span>
+                    <h2 class="text-3xl sm:text-4xl font-serif font-bold text-slate-800">Surat Dari Hati</h2>
+                    <p class="text-slate-500 text-sm sm:text-base mt-2" style="font-size: 14px;">Kalo so se kita ini kong nda ada bumbu-bumbu word of affirmation maka kurengggg yekaann</p>
+                </div>
+
+                <!-- Envelope Box Card -->
+                <div class="glass-card rounded-3xl p-6 sm:p-10 shadow-2xl border border-white relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-28 h-28 bg-gradient-to-br from-sky-200 to-indigo-200 rounded-bl-full opacity-40"></div>
+                    
+                    <div class="mb-6 flex items-center justify-between border-b border-sky-100 pb-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-full bg-sky-200 flex items-center justify-center text-sky-700">
+                                <i class="fa-solid fa-envelope-open-text"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-slate-800 text-sm sm:text-base">To my opet tercintaahhh mwahhh 💌</h3>
+                                <p class="text-xs text-sky-600">7 Oktober • Lebeh Spesial Ini Dari Nasgor</p>
+                            </div>
+                        </div>
+                        <button onclick="restartTypewriter()" class="text-xs text-sky-600 font-bold hover:underline flex items-center space-x-1">
+                            <i class="fa-solid fa-rotate-right"></i>
+                            <span>Baca Ulang</span>
+                        </button>
+                    </div>
+
+                    <!-- Typewriter Text Box -->
+                    <div class="min-h-[220px] text-slate-700 leading-relaxed font-sans text-sm sm:text-base space-y-4">
+                        <p id="typewriterText" class="inline"></p>
+                        <span id="typewriterCursor" class="inline-block w-2 h-5 bg-sky-500 animate-pulse ml-0.5 align-middle"></span>
+                    </div>
+
+                    <div class="mt-8 pt-4 border-t border-sky-100 text-right">
+                        <p class="font-handwriting text-3xl text-sky-700">Sending you warm hugs and lots of love, 💙</p>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">From gue si bespren poreper youu, iicciii</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 6: WISH JAR & REASONS -->
+        <section class="py-20 px-4 relative">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-12">
+                    <span class="text-xs font-bold uppercase tracking-widest text-sky-600 mb-2 block">Interactive Wish Ala-ala✨</span>
+                    <h2 class="text-3xl sm:text-4xl font-serif font-bold text-slate-800">Interactive Wish For Alpiii Yaaarrr Syudududdu Parampammm</h2>
+                </div>
+
+                <!-- Interactive Cards Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" id="reasonsGrid">
+                    <!-- Dynamic Interactive Cards injected via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 7: STICKY NOTES / WISHES CREATOR -->
+        <section class="py-20 px-4 relative mb-12">
+            <div class="max-w-4xl mx-auto">
+                <div class="glass-card rounded-3xl p-8 sm:p-12 shadow-xl border border-white relative">
+                    <div class="text-center mb-8">
+                        <span class="text-xs font-bold uppercase tracking-widest text-sky-600 mb-2 block">Birthday Wall ✨</span>
+                        <h2 class="text-3xl font-serif font-bold text-slate-800">Tulis Harapan / Pesan Baru</h2>
+                        <p class="text-slate-600 text-sm mt-1">Tambah ucapan selamat ulang tahun uniklah kalo nn suka yap</p>
+                    </div>
+
+                    <!-- Input Form -->
+                    <div class="max-w-xl mx-auto mb-10 space-y-3">
+                        <input type="text" id="wishAuthor" placeholder="ur namee" class="w-full px-4 py-3 rounded-2xl border border-sky-200 focus:outline-none focus:ring-2 focus:ring-sky-400 bg-white/90 text-sm shadow-sm">
+                        <textarea id="wishContent" rows="3" placeholder="tulis ucapan atau doa di sini..." class="w-full px-4 py-3 rounded-2xl border border-sky-200 focus:outline-none focus:ring-2 focus:ring-sky-400 bg-white/90 text-sm shadow-sm resize-none"></textarea>
+                        <button onclick="addNewWish()" class="w-full py-3 bg-gradient-to-r from-sky-400 to-indigo-500 hover:from-sky-500 hover:to-indigo-600 text-white font-bold rounded-2xl shadow-md hover:shadow-lg transition-all text-sm flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-paper-plane text-xs"></i>
+                            <span>Tempel Ucapan Ke Papan</span>
+                        </button>
+                    </div>
+
+                    <!-- Sticky Notes Container -->
+                    <div id="stickyNotesBoard" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        <div class="bg-sky-100/90 p-5 rounded-2xl shadow-md border border-sky-200 transform -rotate-1 hover:rotate-0 transition-transform">
+                            <p class="text-xs font-bold text-sky-800 mb-2">📌 Dari Sahabat Karib (Preysli)</p>
+                            <p class="text-sm text-slate-700 italic">Semoga di umur baru ini makin jayaa se jaya gunung jaya wijayaaa, makin gacorr, makin menyalaahh, makin ketcehhhh🥰</p>
+                        </div>
+                        <div class="bg-indigo-100/90 p-5 rounded-2xl shadow-md border border-indigo-200 transform rotate-2 hover:rotate-0 transition-transform">
+                            <p class="text-xs font-bold text-indigo-800 mb-2">📌 Bestie Forever (Candy)</p>
+                            <p class="text-sm text-slate-700 italic">Semogaaa makin banyakk doiii kong jang lupa se akang pkt yuhuuu😋</p>
+                        </div>
+                        <div class="bg-purple-100/90 p-5 rounded-2xl shadow-md border border-purple-200 transform -rotate-2 hover:rotate-0 transition-transform">
+                            <p class="text-xs font-bold text-purple-800 mb-2">📌 Haters (Injili)</p>
+                            <p class="text-sm text-slate-700 italic">Semoga saja tu tinggi ta tambah okii🤪</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="py-8 text-center text-xs text-sky-700 font-semibold border-t border-sky-200/60 bg-white/40 backdrop-blur-md">
+            <p>Made with 💙 for the most amazing best friend • Happy Birthday 7 Oktober, vii! ✨</p>
+        </footer>
+
+    </main>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script src="script.js"></script>
+</body>
+</html>
